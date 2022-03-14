@@ -39,6 +39,7 @@
 #include "flash.h"
 #include "hwsreg.h"
 #include "hwstack.h"
+#include "profile.h"
 
 const unsigned int AvrDevice::registerSpaceSize = 32;
 const unsigned int AvrDevice::totalIoSpace = 0x10000;
@@ -299,6 +300,14 @@ int AvrDevice::Step(bool &untilCoreStepFinished, SystemClockOffset *nextStepIn_n
                 return 0;
             }
 
+            if (PP.end() != find(PP.begin(), PP.end(), PC)) {
+              std::string sym = Flash->GetSymbolAtAddress(PC).c_str();
+              unsigned indent = stack->CountReturnPoints();
+              avr_message("Profiling %s (%d)", sym.c_str(), indent);
+              auto sp = stack->GetStackPointer()+2;
+              stack->SetReturnPoint(sp, new ProfileFunktor(this, sym, indent));
+            }
+
             if(deferIrq) {
                 /* Every IRQ is delayed of one cycle. Normally this happens (see datasheet)
                  * only after a SEI instruction or after a RETI. But because of
@@ -432,6 +441,11 @@ RWMemoryMember* AvrDevice::GetMemRegisterInstance(unsigned int offset) {
 void AvrDevice::RegisterTerminationSymbol(const char *symbol) {
     unsigned int epa = Flash->GetAddressAtSymbol(symbol);
     EP.push_back(epa);
+}
+
+void AvrDevice::RegisterProfileSymbol(const char *symbol) {
+  unsigned int ppa = Flash->GetAddressAtSymbol(symbol);
+  PP.push_back(ppa);
 }
 
 void AvrDevice::DebugOnJump()

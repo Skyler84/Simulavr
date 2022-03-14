@@ -120,7 +120,11 @@ class HWStack {
         /*! Attention! SetReturnPoint must get a COPY of a Funktor because it
             self destroy this functor after usage! */
         void SetReturnPoint(unsigned long stackPointer, Funktor *listener);
-        
+
+        unsigned int CountReturnPoints() const {
+          return returnPointList.size();
+        }
+
         //! Sets lowest stack marker back to current stackpointer
         void ResetLowestStackpointer(void) { lowestStackPointer = stackPointer; }
         //! Gets back the lowest stack pointer (for measuring stack usage)

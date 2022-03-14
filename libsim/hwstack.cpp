@@ -64,7 +64,8 @@ void HWStack::CheckReturnPoints() {
 }
 
 void HWStack::SetReturnPoint(unsigned long stackPointer, Funktor *f) {
-    returnPointList.insert(std::make_pair(stackPointer, f));
+    auto it = returnPointList.lower_bound(stackPointer);
+    returnPointList.insert(it, std::make_pair(stackPointer, f));
 }
 
 HWStackSram::HWStackSram(AvrDevice *c, int bs, bool initRE):

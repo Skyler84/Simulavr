@@ -136,6 +136,8 @@ std::vector<string_pair_t> newUsage = {
      "stops simulation if PC runs on <label>, <label> is a text label or a address"},
     {"-B <label>, --breakpoint <label>",
      "same as -T for backward compatibility"},
+    {"-P <label>, --profile <label>",
+     "profile function given by <label>"},
     {"-M",
      "disable messages for bad I/O and memory references"},
     {"-l <number>, --linestotrace <number>",
@@ -229,6 +231,7 @@ int main(int argc, char *argv[]) {
     std::string writeToPipeFileName = "";
     
     std::vector<std::string> terminationArgs;
+    std::vector<std::string> profileArgs;
     
     std::vector<std::string> tracer_opts;
     bool tracer_dump_avail = false;
@@ -256,6 +259,7 @@ int main(int argc, char *argv[]) {
             {"verbose", 0, 0, 'v'},
             {"terminate", 1, 0, 'T'},
             {"breakpoint", 1, 0, 'B'},
+            {"profile", 1, 0, 'P'},
             {"core-dump", 1, 0, 'C'},
             {"irqstatistic", 0, 0, 's'},
             {"help", 0, 0, 'h'},
@@ -264,7 +268,7 @@ int main(int argc, char *argv[]) {
         
         c = getopt_long(argc,
                         argv,
-                        "a:e:f:d:gGMm:p:t:uxyzhvnisF:R:W:VT:B:c:C:o:l:",
+                        "a:e:f:d:gGMm:p:t:uxyzhvnisF:R:W:VT:B:P:c:C:o:l:",
                         long_options,
                         &option_index);
         if(c == -1)
@@ -274,6 +278,9 @@ int main(int argc, char *argv[]) {
             case 'B':
             case 'T':
                 terminationArgs.push_back(optarg);
+                break;
+            case 'P':
+                profileArgs.push_back(optarg);
                 break;
             
             case 'v':
@@ -509,6 +516,10 @@ int main(int argc, char *argv[]) {
     for(ii = terminationArgs.begin(); ii != terminationArgs.end(); ii++) {
         avr_message("Termination or Breakpoint Symbol: %s", (*ii).c_str());
         dev1->RegisterTerminationSymbol((*ii).c_str());
+    }
+    for(ii = profileArgs.begin(); ii != profileArgs.end(); ii++) {
+        avr_message("Profile Symbol: %s", (*ii).c_str());
+        dev1->RegisterProfileSymbol((*ii).c_str());
     }
     
     //if not gdb, the ui will be master controller :-)

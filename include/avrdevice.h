@@ -46,6 +46,7 @@
 // transfered from breakpoint.h
 class Breakpoints: public std::vector<dword> { };
 class Exitpoints: public std::vector<dword> { };
+class ProfilePoints: public std::vector<dword> { };
 
 // from hwsreg.h, but not included, because of circular include with this header
 class HWSreg;
@@ -90,6 +91,7 @@ class AvrDevice: public SimulationMember, public TraceValueRegister {
         int trace_on;
         Breakpoints BP;
         Exitpoints EP;
+        ProfilePoints PP;
         unsigned int PC;  ///< Next/current instruction index. Multiply by 2 to get an address.
         /// When mupti-cycle instruction is "processed" this holds its address, PC holds the next instruction.
         unsigned int cPC;
@@ -158,6 +160,7 @@ class AvrDevice: public SimulationMember, public TraceValueRegister {
         bool ReplaceMemRegister(unsigned int offset, RWMemoryMember *);
         RWMemoryMember *GetMemRegisterInstance(unsigned int offset);
         void RegisterTerminationSymbol(const char *symbol);
+        void RegisterProfileSymbol(const char *symbol);
 
         Pin *GetPin(const char *name);
         /*! Steps the AVR core.
